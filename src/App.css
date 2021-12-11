@@ -1,0 +1,44 @@
+body{
+  background-image: url("./assets/bg1.jpg");
+  background-color: #111;
+  background-position:center center;
+  background-repeat:no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+
+  display: flex; flex-direction: column; height: 100%;
+}
+.logo {
+  background: -webkit-linear-gradient(#eee, #333);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.darkTransparentBackground {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+.btn-outline-light:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: white;
+}
+.chatNav {
+  height: 75vh;
+}
+.chatInputDiv textarea {
+  resize: none;
+  overflow: hidden;
+}
+.sentMessage, .receivedMessage, .date {
+  max-width: 75%;
+  width: fit-content;
+  border-radius: 10px;
+}
+.date {
+  background-color: lightblue;
+}
+.sentMessage {
+  background-color: aquamarine;
+}
+.receivedMessage {
+  background-color:bisque;
+}
