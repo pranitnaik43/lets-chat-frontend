@@ -18,7 +18,7 @@ const ChatList = ({ setConnection }) => {
     //get friends and groups
     try {
       config.method = 'GET';
-      config.url = process.env.REACT_APP_SERVER_URL + '/groups';
+      config.url = process.env.REACT_APP_SERVER_URL + '/friends';
       axios(config).then(response => {
         // console.log(response);
         if (response.data.error) {

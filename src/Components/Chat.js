@@ -2,13 +2,12 @@ import { useState, useEffect } from 'react';
 import { useSelector } from "react-redux";
 import axios from 'axios';
 
-const Chat = ({ connection }) => {
+const Chat = ({ connection, setConnection, socket }) => {
   // auth state from redux store
   const authState = useSelector((state) => state.auth);
 
   const [chats, setChats] = useState([]); //either group or friend
   const [message, setMessage] = useState("");
-  const [data, setDate] = useState(null);
 
   var configTemp = {
     headers: {
@@ -16,8 +15,7 @@ const Chat = ({ connection }) => {
     }
   };
 
-  useEffect(() => {
-    //get chats
+  const getMessages = () => {
     let config = { ...configTemp };
     config.method = 'GET';
     config.url = process.env.REACT_APP_SERVER_URL + '/chats/' + connection._id;
@@ -34,6 +32,15 @@ const Chat = ({ connection }) => {
     }).catch(err => {
       console.log(err);
     });
+  }
+
+  socket.on(connection._id, () => {
+    console.log("new message");
+    getMessages();
+  })
+
+  useEffect(() => {
+    getMessages();
     // eslint-disable-next-line
   }, [connection]);
 
@@ -75,6 +82,9 @@ const Chat = ({ connection }) => {
         console.log(response.data.error);
       } else if (response.data.success) {
         console.log(response.data.success)
+        
+        //notify receiver via server
+        socket.emit("message", connection._id);
       }
     }).catch(err => {
       console.log(err);
@@ -83,9 +93,12 @@ const Chat = ({ connection }) => {
 
   return (
     <div className="bg-secondary bg-opacity-75 overflow-auto chatNav d-flex flex-column">
-      {console.log(connection._id, chats)}
+      {/* {console.log(connection._id, chats)} */}
       <div className="bg-secondary py-3 px-3 text-warning">
-        <h3>{connection.friendsData.first_name + " " + connection.friendsData.last_name}</h3>
+        <button className="btn btn-danger rounded-circle btn-sm d-inline-block float-start">
+          <i className="bi bi-arrow-left my-auto" onClick={() => { setConnection(null) }}></i>
+        </button>
+        <h3 className="ms-3 d-inline-block">{connection.friendsData.first_name + " " + connection.friendsData.last_name}</h3>
       </div>
       <div className="pt-2 px-2 overflow-auto">
         {
@@ -103,8 +116,7 @@ const Chat = ({ connection }) => {
                   
                   <div className={"m-1 py-1 px-2 " + ((chat.from === authState.userEmail) ? "ms-auto sentMessage" : "me-auto receivedMessage")}>
                     <span>{chat.message}</span>
-                    <div className="text-end d-inline-block"><sub className="px-2">{getTime(chat.timestamp)}</sub></div>
-                    {/* <span className="float-end border border-danger"><sub className="px-2">{getTime(chat.timestamp)}</sub></span> */}
+                    <div className="text-end d-inline-block me-auto"><small><sub className="ps-2 pe-1">{getTime(chat.timestamp)}</sub></small></div>
                   </div>
                   </>
                 }
