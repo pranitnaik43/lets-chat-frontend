@@ -10,6 +10,8 @@ toast.configure()
 const AddFriend = ({ showModal, setShowModal }) => {
   // auth state from redux store
   const authState = useSelector((state) => state.auth);
+  // socket state from redux store
+  const socket = useSelector((state) => state.socket.socket);
 
   const [email, setEmail] = useState([]);
   const inputRef = useRef();
@@ -21,13 +23,24 @@ const AddFriend = ({ showModal, setShowModal }) => {
     // eslint-disable-next-line
   }, [showModal]);
 
+  const emitFriendRequest = () => {
+    //notify receiver about the message. Keep trying every 3 secs if not sent
+    let tryAgain = true;
+    if(socket) {
+      console.log("emit-friend-request")
+      socket.emit("friend-request", email); 
+      tryAgain = false;
+    }
+    if(tryAgain) setTimeout(emitFriendRequest, 3000);
+  }
+
   const handleChange = (e) => {
     setEmail(e.target.value);
   }
 
   var config = {
     method: "POST",
-    url: process.env.REACT_APP_SERVER_URL + '/friends/add-friend',
+    url: process.env.REACT_APP_SERVER_URL + '/friends/requests',
     headers: {
       'Content-Type': 'application/json',
       'access-token': authState.accessToken
@@ -35,17 +48,17 @@ const AddFriend = ({ showModal, setShowModal }) => {
   };
 
   const handleSubmit = (e) => {
-    console.log(config.url, authState.accessToken);
     e.preventDefault();
     config.data = { email: email, status: "pending" };
     axios(config).then(response => {
       if (response.data) {
         if (response.data.error) {
-          console.log(response.data.error.message);
+          // console.log(response.data.error.message);
           toast.error(response.data.error.message, { autoClose: 5000 });
         } else if (response.data.success) {
-          console.log(response.data.success.message);
+          // console.log(response.data.success.message);
           toast.success(response.data.success.message, { autoClose: 5000 });
+          emitFriendRequest();
         }
       }
       setShowModal(false);
@@ -63,7 +76,7 @@ const AddFriend = ({ showModal, setShowModal }) => {
             <span aria-hidden="true">&times;</span>
           </button>
         </Modal.Header>
-        <form>
+        <form onSubmit={handleSubmit}>
           <Modal.Body>
             <div className="">
               <label htmlFor="email" className="form-label">Email address</label>
@@ -72,7 +85,7 @@ const AddFriend = ({ showModal, setShowModal }) => {
           </Modal.Body>
           <Modal.Footer>
             <button type="button" className="btn btn-secondary" onClick={() => { setShowModal(false) }}>Close</button>
-            <button type="submit" className="btn btn-primary" onClick={handleSubmit} disabled={!email}>Submit</button>
+            <button type="submit" className="btn btn-primary" onClick={handleSubmit} disabled={!email}>Send Friend Request</button>
           </Modal.Footer>
         </form>
       </Modal>

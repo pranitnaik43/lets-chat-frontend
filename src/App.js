@@ -14,9 +14,9 @@ function App() {
     <div>
       <BrowserRouter>
         <Provider store={store}>
-          <h1 className="logo m-2">LetsChat</h1>
+          <div className="logo fs-2">LetsChat</div>
           <Nav />
-          <div className="container-fluid">
+          <div className="">
             <Switch>
               <Route exact path="/home" component={Home}></Route>
               <Route path="/login" component={Login}></Route>

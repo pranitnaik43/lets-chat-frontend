@@ -1,23 +1,26 @@
 import Chat from "./Chat";
 import ChatList from "./ChatList";
 import { useState, useEffect } from "react";
-import socketClient from "socket.io-client";
 
 const Home = () => {
-  const maxSmallScreenWidth = 768;
-  const [screenWidth, setWidth] = useState(window.innerWidth);
-  const [isSmallScreen, setIsSmallScreen] = useState(screenWidth < maxSmallScreenWidth);
-  const [connection, setConnection] = useState(null);
 
-  var socket = socketClient(process.env.REACT_APP_SERVER_URL);
+  const maxSmallScreenWidth = 768;
+  let initialWidth = window.innerWidth;
+  console.log(initialWidth);
+  const [screenWidth, setWidth] = useState(initialWidth);
+  const [isSmallScreen, setIsSmallScreen] = useState(initialWidth < maxSmallScreenWidth);
+  const [connection, setConnection] = useState(null);
 
   useEffect(() => {
     window.addEventListener("resize", () => {
       setWidth(window.innerWidth);
+      //clean state on unmount
+      return () => {
+        setWidth(null);
+        setIsSmallScreen(null);
+      };
     });
-    socket.on('connection', () => {
-      console.log("new connection");
-    });
+
     // eslint-disable-next-line
   }, []);
 
@@ -26,29 +29,29 @@ const Home = () => {
   }, [screenWidth]);
 
   return (
-    <>
-      {/* {console.log("check", connection)} */}
-      <div className="">
-        <div className="row mt-md-3 mx-md-2 mx-lg-4 border rounded">
+    <div className="mainPage">
+      <div className="container-fluid h-100">
+        <div className="row h-100 p-md-2 px-lg-4 d-flex justify-content-center">
           {/* List of friends and groups */}
           {
             (!isSmallScreen || !connection) ? (
-              <div className="col-12 col-md-4 col-lg-3 p-0 m-0 border border-white rounded">
+              <div className="h-100 col-12 col-md-4 col-lg-3 p-0 m-0">
                 <ChatList setConnection={setConnection} />
               </div>
             ) : (<></>)
           }
           {/* chat section */}
-          <div className="col-12 col-md-8 col-lg-9 p-0 m-0 border border-white rounded">
-            {
-              (connection) ? (
-                <Chat connection={connection} setConnection={setConnection} socket={socket} />
-              ) : (<></>)
-            }
-          </div>
+          {
+            (connection) ? (
+              <div className="h-100 col-12 col-md-8 col-lg-9 p-0 m-0">
+                <Chat connection={connection} setConnection={setConnection} />
+              </div>
+            ) : (<></>)
+          }
+
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

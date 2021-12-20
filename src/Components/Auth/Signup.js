@@ -95,7 +95,7 @@ const Signup = ({history}) => {
     <>
       <div className="row my-4 justify-content-center">
         <div className="col-12 col-sm-8 col-md-6 darkTransparentBackground px-5 py-4">
-          <h1 className="text-center text-primary">Register</h1>
+          <h1 className="text-center text-primary mt-3">Register</h1>
           <hr/>
           <form>
             <div className="mb-3">

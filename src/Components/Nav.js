@@ -1,17 +1,22 @@
 import { NavLink, withRouter } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
 import { EMPTY } from "../reducers/authReducer";
+import { SET_SOCKET } from '../reducers/socketReducer';
 import { useState, useEffect } from 'react';
 import AddFriend from './AddFriend';
+import Notifications from "./Notifications";
+import socketClient from "socket.io-client";
 
 const Nav = ({ history }) => {
 
   // auth state from redux store
   const authState = useSelector((state) => state.auth);
 
-  // dispatch actions for auth reducer
   const dispatch = useDispatch();
+  // dispatch action for auth reducer
   const resetAuth = () => dispatch({ type: EMPTY });
+  // dispatch action for socket reducer
+  const setSocket = (socket) => dispatch({ type: SET_SOCKET, socket });
 
   const [showAddFriend, setShowAddFriend] = useState(false);
 
@@ -19,6 +24,14 @@ const Nav = ({ history }) => {
     if (!authState.accessToken) {
       history.push("/login");
     }
+
+    //create socket
+    var socket = socketClient(process.env.REACT_APP_SERVER_URL);
+    socket.on('connection', () => {
+      console.log("new connection");
+    });
+    //add socket to redux store
+    setSocket(socket);
     // eslint-disable-next-line
   }, []);
 
@@ -29,35 +42,35 @@ const Nav = ({ history }) => {
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark bg-opacity-50 border border-light">
+      <nav className="navbar navbar-expand-lg navbar-dark bg-dark bg-opacity-75 border border-light w-100 position-absolute">
+        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span className="navbar-toggler-icon"></span>
+        </button>
         <div className="collapse navbar-collapse mx-3" id="navbarNav">
           <ul className="navbar-nav">
             {
               (authState.accessToken) ? (
                 <>
                   <NavLink className="nav-link" to="/home">Home</NavLink>
-                  <button className="btn btn-outline-light mx-1" onClick={() => { setShowAddFriend(true) }}><i className="bi bi-person-plus me-2"></i>Add Friend</button>
+                  
+                  <button className="btn btn-outline-light mx-1 my-1 my-md-0" onClick={() => { setShowAddFriend(true) }}><i className="bi bi-person-plus me-2"></i>Add Friend</button>
                   <AddFriend showModal={showAddFriend} setShowModal={setShowAddFriend}/>
-                  <button className="btn btn-outline-light mx-1"><i className="bi bi-people me-2"></i>Create Group</button>
+                  
+                  <button className="btn btn-outline-light mx-1 my-1 my-md-0"><i className="bi bi-people me-2"></i>Create Group</button>
+                  
+                  <div className="dropdown" style={{ marginRight: "150px" }}>
+                    <Notifications />
+                  </div>
                 </>
               ) : (<></>)
             }
-            {
-              (authState.isAdmin) ? (
-                <>
-                  <NavLink className="nav-link" to="/add-friend">Add Friend</NavLink>
-                </>
-              ) : (<></>)
-            }
+            
           </ul>
           <ul className="navbar-nav ms-auto">
             {
               (authState.accessToken) ? (
                 <>
-                <button className='btn btn-outline-light mx-1' id="dropdownMenuLink" data-bs-toggle="dropdown">
-                  <i className="bi bi-bell-fill"></i>
-                </button>
-                <li className="nav-link" onClick={(e) => { handleLogout(e) }}>Logout</li>
+                  <li className="nav-link" onClick={(e) => { handleLogout(e) }}>Logout</li>
                 </>
               ) : (
                 <>
@@ -68,9 +81,6 @@ const Nav = ({ history }) => {
             }
           </ul>
         </div>
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span className="navbar-toggler-icon"></span>
-        </button>
       </nav>
     </>
   );
