@@ -47,7 +47,9 @@ const Notifications = () => {
   }, []);
 
   useEffect(() => {
+    console.log(socket);
     if (socket) {
+      console.log("event added:", authState.userEmail);
       socket.on(authState.userEmail, (message) => { 
         console.log(message);
         if (message === "friend-request") getFriendRequests();
@@ -104,7 +106,7 @@ const Notifications = () => {
 
   return (
     <>
-      {console.log(friendRequests)}
+      {console.log(friendRequests, socket)}
       <button className='btn btn-outline-light mx-1 my-1 my-md-0' type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
         <span className='position-relative'>
           <i className="bi bi-bell-fill"></i>

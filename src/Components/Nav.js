@@ -56,7 +56,7 @@ const Nav = ({ history }) => {
                   <button className="btn btn-outline-light mx-1 my-1 my-md-0" onClick={() => { setShowAddFriend(true) }}><i className="bi bi-person-plus me-2"></i>Add Friend</button>
                   <AddFriend showModal={showAddFriend} setShowModal={setShowAddFriend}/>
                   
-                  <button className="btn btn-outline-light mx-1 my-1 my-md-0"><i className="bi bi-people me-2"></i>Create Group</button>
+                  {/* <button className="btn btn-outline-light mx-1 my-1 my-md-0"><i className="bi bi-people me-2"></i>Create Group</button> */}
                   
                   <div className="dropdown" style={{ marginRight: "150px" }}>
                     <Notifications />
@@ -70,7 +70,7 @@ const Nav = ({ history }) => {
             {
               (authState.accessToken) ? (
                 <>
-                  <li className="nav-link" onClick={(e) => { handleLogout(e) }}>Logout</li>
+                  <li className="nav-link" role="button" onClick={(e) => { handleLogout(e) }}>Logout</li>
                 </>
               ) : (
                 <>
